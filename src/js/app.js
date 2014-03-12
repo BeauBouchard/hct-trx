@@ -2,15 +2,16 @@
 
 game = new Game();
 game.initialize();
-		addEventListener("keydown", function (e) {
-				game.keyStroke[e.keyCode] = true;
-			}, false);
-		addEventListener("keyup", function (e) {
-				delete game.keyStroke[e.keyCode];
-			}, false);
-
-			
-//setInterval(function(){game.main()},1);
 
 
-window.webkitRequestAnimationFrame(game.main);
+if (!window.requestAnimationFrame) {// http://paulirish.com/2011/requestanimationframe-for-smart-animating/
+  window.requestAnimationFrame = window.webkitRequestAnimationFrame || 
+                                 window.mozRequestAnimationFrame    || 
+                                 window.oRequestAnimationFrame      || 
+                                 window.msRequestAnimationFrame     || 
+                                 function(callback, element) {
+                                   window.setTimeout(callback, 1000 / 60);
+                                 }
+}
+
+window.requestAnimationFrame(game.loop);
