@@ -1,82 +1,110 @@
-/*
- * Game Engine for Sprite Based HTML5 Canvas Game
- * Author: Beau Bouchard (@beaubouchard)
- */
- 
-
-var game;
-
+//+------------------------------------------------+
+//| 		GAME 				   |
+//+------------------------------------------------+
 function messagelog(text){
 	console.log("## " + text);
 }
 
-
-
-//+------------------------------------------------+
-//| 		GAME 				   |
-//+------------------------------------------------+
-
 function Game(){
+	messagelog("game");
 	this.gamewindow = document.getElementById("game");
-	this.map = new Map();
-	this.tick=0;
-	this.player = new Player();
-	this.keyStroke = [];
+	this.map 		= new Map();
+	this.player 	= new Player();	
+	this.ball 		= new Ball();
+	this.ball1 		= new Ball();
+	this.ball2 		= new Ball();
+	this.ball3 		= new Ball();
+	this.score		= 0;
+	this.tick		= 0;
+	this.keyStroke 	= [];
 	this.then;
-	this.now = Date.now();;
+	this.now 		= Date.now();;
 	this.delta;
-	this.fps = 0;
+	this.fps 		= 0;
 	
 }
-Game.prototype = {
+Game.prototype = {	
 	initialize: function() {
-		messagelog("game.prototype initialize");
-		
-		this.map.initialize();
-		this.player.initialize(this.map.getContext());
-		
-		this.onstart();
+			messagelog("game.prototype initialize");
+			this.map 		= new Map();
+			this.player 	= new Player();	
+			this.ball 		= new Ball();
+			this.tick		= 0;
+			this.count		= 0;
+			this.keyStroke 	= [];
+			this.then		= Date.now();
+			this.now 		= Date.now();
+			this.delta;
+			this.fps 		= 0;
+			this.onstart();
 		
 	},
 	onready: function() { 
-	
+		messagelog("game.prototype onready");
 	},
 	onstart: 			function() {
-		
-		messagelog("game.prototype.onstart");
+		messagelog("game.prototype onstart");
+		this.map.initialize();
+		this.ball.initialize();
+		this.ball1.initialize();
+		this.ball2.initialize();
+		this.ball3.initialize();
+
+
+
 	},
-	renderToCanvas: 	function(){
+	onend: 			function() {
+			//game over, this happens after score is met
+		messagelog("game.prototype onend");
+		this.map.getContext().fillStlye = "white";
+		this.map.getContext().font = "20px Arial, sans-serif";
+		this.map.getContext().textAlign = "center";
+		this.map.getContext().textBaseline = "middle";
+		this.map.getContext().fillText("Game Over", W/2, H/2 + 25);
+
 	},
-	parseImage: 		function(image, callback) {
-	
-	},
-	setupLevel: 		function(source) {
-		
+	onscore: 			function() {
+			//when the ball is past the paddle
+		messagelog("game.prototype onscore");
 	},
 	//+------------------------------------------------+
 	//| 		Game loop			   |
 	//+------------------------------------------------+
 	//Game loop
-	main: 				function(){
-		
-		this.now = Date.now();
-		this.fps = 
+	loop: 				function(){
+		this.now = Date.now(); 
 		this.delta = this.now - this.then;
-		this.fps = 	game.update( 1000 / this.delta );
+		this.fps = 	1000 / this.delta;
+		game.update( 1);
 		game.render();
-		
-		
+		this.count++;
 		this.then = this.now;
 	},
 	update: 			function(incMod){
 		//incMod = fps
+
 		game.handleInput(incMod);
-		
-		
+		this.ball.update(incMod);
+		this.ball1.update(incMod);
+		this.ball2.update(incMod);
+		this.ball3.update(incMod);
 	},
 	render:				function(){
 		//here we move shit, and render game
-		window.webkitRequestAnimationFrame(game.main);
+		//this.
+		this.ball.render();
+		this.ball1.render();
+		this.ball2.render();
+		this.ball3.render();
+
+		this.map.getContext().fillStlye = "white";
+		this.map.getContext().font = "20px Arial, sans-serif";
+		this.map.getContext().textAlign = "center";
+		this.map.getContext().textBaseline = "middle";
+		this.map.getContext().fillText("FPS:"+this.fps , 32,32);
+
+
+		window.webkitRequestAnimationFrame(game.loop);
 	},
 	//+------------------------------------------------+
 	//| 		INPUT 				   |
@@ -84,14 +112,6 @@ Game.prototype = {
 	// Event listener for keystroke codes
 	handleInput:		function(incMod){
 			
-			if ((38 in this.keyStroke )|| (87 in this.keyStroke)) {// up key stroke or 'w' key stroke
-				game.player.tryMove(game.player.getX() ,(game.player.getY() + (game.player.getSpeed() )));
-				game.tick += incMod*5;
-			}
-			if ((40 in this.keyStroke) || (83 in this.keyStroke)) { // down key stroke or 's' key stroke
-				game.player.tryMove(game.player.getX() ,(game.player.getY() - (game.player.getSpeed() )));
-				game.tick += incMod*5;
-			}
 			if ((37 in this.keyStroke) || (65 in this.keyStroke)){ // left key stroke or 'a' key stroke
 				game.player.tryMove((game.player.getX() + (game.player.getSpeed() )),game.player.getY());
 				game.tick += incMod*5;
@@ -110,16 +130,128 @@ Game.prototype = {
 			// PLAYER VARIABLES
 	}
 }
+
 //+------------------------------------------------+
-//| 		MAP  				   |
+//| 		Player	 			   |
 //+------------------------------------------------+
-function Map(){
+function Player(){
+	this.x;
+	this.y;
+	this.sprite;
+	this.cells  = []; // entities track which cells they currently occupy
+	
+	this.speed = 5; //pixels per second
+}
+Player.prototype = {
+	initialize: function(context) {
+		messagelog("player initialize");
+		this.x = game.map.getCanvas().width / 2;
+		this.y = game.map.getCanvas().height / 2;
+	},
+	spawn: 			function(ix, iy) {
+
+	},
+	render: 		function() {
+		
+	}
+}
+
+//+------------------------------------------------+
+//| 		Ball  	 			   |
+//+------------------------------------------------+
+function Ball(){
+	this.x;
+	this.y;
+	this.cells  	= []; // entities track which cells they currently occupy
+	this.speed;
+	this.context;
+	this.colorR;
+	this.colorG;
+	this.colorB;
+	this.dirX;
+	this.dirY;
+	this.top;
+	this.bottom;
+	this.left;
+	this.right;
+}
+Ball.prototype = {
+	initialize: function(context) {
+		messagelog("Ball.prototype initialize");
+		this.context 	= game.map.getContext();
+		this.x 			= game.map.getCanvas().width / 2;
+		this.y 			= game.map.getCanvas().height / 2;
+		this.speed 		= 5; //pixels per second
+		this.colorR 	= Math.floor((Math.random()*250)+1);
+		this.colorG 	= Math.floor((Math.random()*250)+1);
+		this.colorB 	= Math.floor((Math.random()*250)+1);
+		this.color = "rgb("+this.colorR+","+this.colorG+","+this.colorB+")";
+		this.radius 	= 5;
+		this.top		= 0 + this.radius;
+		this.bottom		= game.map.getCanvas().width - this.radius;
+		this.left		= 0 + this.radius;
+		this.right		= game.map.getCanvas().height - this.radius;
+		this.spawn();
+	},
+	spawn: 			function() {
+		this.context.fillStyle = this.color;
+		this.context.beginPath();
+		this.context.arc(this.x, this.y, 5, 0, Math.PI*2, false);
+		this.context.fill();
+     	this.context.closePath();
+		this.start();
+	},
+	start: 		function() {
+		//decides if the ball is going up or down
+		this.dirX = Math.floor((Math.random()*20)-10); // random angle 1- 10
+		this.dirY = Math.floor((Math.random()*20)-10); // random angle 1- 10 
+		//wrap your head around this
+
+		
+
+	},
+	update: 		function(incMod) {
+		this.x = this.x + (this.dirX * incMod);
+    	this.y = this.y + (this.dirY * incMod);
+
+		if((this.dirX > 0) && (this.x > this.bottom)) {
+		this.x = this.bottom;
+		this.dirX = -this.dirX;
+		}
+		else if ((this.dirX < 0) && (this.x < this.top)) {
+		this.x = this.top;
+		this.dirX = -this.dirX;
+		}
+
+		if ((this.dirY > 0) && (this.y > this.right)) {
+		this.y = this.right;
+		this.dirY = -this.dirY;
+		}
+		else if ((this.dirY < 0) && (this.y < this.left)) {
+		this.y = this.left;
+		this.dirY = -this.dirY;
+		}
+	},
+	render: 		function() {
+		this.context.fillStyle = this.color ;
+		this.context.beginPath();
+		this.context.arc(this.x, this.y, 5, 0, Math.PI*2, false);
+		this.context.fill();
+     	this.context.closePath();
+	}
+}
+
+//+------------------------------------------------+
+//| 		Map  	 			   |
+//+------------------------------------------------+
+function Map(inccanvas){
 	this.canvas;
 	this.context;
 }
 Map.prototype = {
-	initialize: function() {
-		messagelog("map.prototype initialize");
+	initialize: function(context) {
+		messagelog("Map.prototype initialize");
+	
 		this.canvas 		= document.createElement("canvas");
 	 	this.context 		= this.canvas.getContext("2d");
 	 	this.canvas.width 	= 1024;
@@ -134,296 +266,33 @@ Map.prototype = {
 	getContext: function() {
 		return this.context;
 	},
-	//loosely based on Jake Gordon's Gaunlet level map generator. 
-	//A little more powerful than I need it to be
-	loadMapImage: function(incSource, onload) {
-		var image = document.createElement('img');
-		image.on('load', onload);
-		image.src = incSource;
-		return image;
-	},
-	parseMap: function(incMapTemplateImage, callback) {
-		/*
-			extract the image width & height
-			render the image to a temporary <canvas>
-			extract the raw pixel imageData
-			provide 3 helper methods to do some low level pixel bit manipulation
-			iterate through all the pixels, calling the callback once for each pixel
-		*/
-		var image = incMapTemplateImage, 
-			totalHeight			= incMapTemplateImage.height, 
-			totalWidth 			= incMapTemplateImage.width,
-			tempCanvas,tempContext,data,tx,ty;
-		tempCanvas = document.createElement('canvas');
-			tempCanvas.width = totalWidth;
-			tempCanvas.height = totalHeight;
-			tempContext = tempCanvas.getContext('2d');
-			tempContext.drawImage(image, 0, 0);
-		data    = ctx.getImageData(0, 0, totalWidth, totalHeight).data;
-		var helpers = {
-			valid: function(tx,ty) { return (tx >= 0) && (tx < totalWidth) && (ty >= 0) && (ty < totalHeight); },
-			//which entry in the imageData represents this tile
-			index: function(tx,ty) { return (tx + (ty*totalWidth)) * 4; },
-			//Pixel returns the pixel color for that tile
-			pixel: function(tx,ty) { 
-				var i = this.index(tx,ty); 
-				return this.valid(tx,ty) ? (data[i]<<16)+(data[i+1]<<8)+(data[i+2]) : null;
-			}//pixel
-		}//helpers
-
-		//run loop for each tx,ty pixel
-		for(ty = 0 ; ty < totalHeight ; ty++) {
-			for(tx = 0 ; tx < totalWidth ; tx++) {
-				//check that pixel
-				callback(tx, ty, helpers.pixel(tx,ty), helpers);
-			}
-		}
-	},//parseMap
-	setupMap: function (incMapTemplateImage) {
-		//not yet
-		function is(pixel, type) 		{ return ((pixel & PIXEL.MASK.TYPE) === type); };
-		function type(pixel)     		{ return  (pixel & PIXEL.MASK.SUBTYPE) >> 4;   };
-		function iswall(pixel)         	{ return is(pixel, PIXEL.WALL);      };
-		function isstart(pixel)        	{ return is(pixel, PIXEL.START);     };
-		function isexit(pixel)         	{ return is(pixel, PIXEL.EXIT);      };
-		Game.parseImage(source, function(tx, ty, pixel) {
-			if (isstart(pixel))
-				setStart(tx, ty);
-			else if (iswall(pixel))
-				addWall(tx, ty);
-			else if (isexit(pixel))
-				addExit(tx, ty);
-		});
-	}//setupMap
-
-} // Map
-
-//+------------------------------------------------+
-//| 		Monster 			   |
-//+------------------------------------------------+
-function Monster (){
-}
-Monster.prototype = {
-	initialize: function() {
-	
-	},
-	spawn: function(ix, iy) {
-		
-	},
-	render: function() {
-		
-	},
-	tryMove: function(dX, dY) {
-		
-	}
- }
-  
-//+------------------------------------------------+
-//| 		Player	 			   |
-//+------------------------------------------------+
-function Player(){
-	this.x;
-	this.y;
-	this.sprite;
-	this.cells  = []; // entities track which cells they currently occupy
-	
-	this.speed = 5; //pixels per second
-}
-Player.prototype = {
-	initialize: function(context) {
-		messagelog("game.player.initialize");
-		this.sprite = new Sprite("box");
-		this.x = game.map.getCanvas().width / 2;
-		this.y = game.map.getCanvas().height / 2;
-		this.sprite.initialize(this.x,this.y);
-	},
-	loadSprite: 	function() {
-
-		
-	},
 	spawn: 			function(ix, iy) {
-		this.sprite.spawn(ix, iy);
+
 	},
 	render: 		function() {
 		
-	},
-	tryMove: 		function(iX, iY) {
-		
-		//there will be some colition detection here later. "
-		messagelog(iX);
-		this.x = iX;
-		this.y = iY;
-		this.sprite.draw(this.x, this.y);
-	},
-	getX: 			function(){
-		return this.x;
-	},
-	getY: 			function(){
-		return this.y;
-	},
-	getSpeed: 		function(){
-		return this.speed;
 	}
 }
 
+
 //+------------------------------------------------+
-//| 		Entity	 			   |
+//| 		Player  	 			   |
 //+------------------------------------------------+
-// other non-moving items. Including barriers/grass
-function Entity(){
-	var x,y,size,passable = false;
-}
-Entity.prototype = {
-	initialize: function() {
+function Player(inccanvas){
+	this.width = 32;
+	this.height = 10;
 	
+}
+Player.prototype = {
+	initialize: function(context) {
+		messagelog("Player.prototype initialize");
+
 	},
-	render: function() {
+	spawn: 			function(ix, iy) {
+
+	},
+	render: 		function() {
 		
 	}
 }
 
-//+------------------------------------------------+
-//| 		Sprite	 			   |
-//+------------------------------------------------+
-function Sprite(inctype){
-	this.spritetype = inctype;
-	this.spritetable =[
-	["box", "None"],
-	["player", "media/images/player.png"],
-	["monster", "media/images/badguy.png"],
-	["tallgrass", "media/images/tallgrass.png"]
-	];
-	
-}
-Sprite.prototype = {
-	initialize: 		function(iX, iY) {
-		messagelog("game.player.sprite.initialize : Type :" + this.spritetype);
-		this.context = game.map.getContext();
-		this.spawn(iX, iY);
-	},
-	spawn:				function(iX, iY) {
-		switch (this.spritetype) {
-			case "box":
-				this.context.fillStyle = "rgb(200,0,0)";
-				this.context.fillRect (10, 10, 55, 50);
-				break;
-			case "player":
-				
-				break;
-			case "monster":
-			
-				break;
-			case "tallgrass":
-				break;
-			default:
-				this.context.fillStyle = "rgb(200,0,0)";
-				this.context.fillRect (10, 10, 55, 50);
-		}
-	},
-	preloadImages:		function() {
-	
-	},
-	loadImage: 			function(){
-	},
-	parseImage:			function(){
-	},
-	draw:			function(iX, iY){
-		switch (this.spritetype) {
-			case "box":
-				this.context.clearRect(0,0,game.map.getCanvas().width,game.map.getCanvas().height);
-				this.context.fillStyle = "rgb(200,0,0)";
-				this.context.fillRect (iX, iY, 55, 50);
-				break;
-			case "player":
-				
-				break;
-			case "monster":
-			
-				break;
-			case "tallgrass":
-				break;
-			default:
-				this.context.fillStyle = "rgb(200,0,0)";
-				this.context.fillRect (iX, iY, 55, 50);
-		}
-	}
-
-}
-
-
-
-//+------------------------------------------------+
-//| 		Menu	 			   |
-//+------------------------------------------------+
-
-//		Each Array contains strings, First string is title, each one following is option
-//		"menu Title", Option 1, Option 2, ...
-var menuArray = [
-		["Main Menu","New Game", "Load Game","2:Help", "Exit"],
-		["World Map Menu","Something"],
-		["In Battle Menu","Something"]];
-var subMenuArray = [
-		
-		["submenu title 1","submenu option 1","submenu option 2","submenu option 3"],
-		["submenu title 2","submenu option 1","submenu option 2","submenu option 3"],
-		["Help Sub Menu","About Game", "Controls"]];
-		
-		
-function Menu(){
-	this.menuList = [];
-	
-        this.subMenuOpen = false;
-
-}
-Menu.prototype = {
-	
-	initialize: 		function(incMenuNum) {
-		//assign which menu to bring up.
-		this.menuList = menuArray[incMenuNum];
-		//loop through menu
-		for (var i = 0; i < this.menuList.length; i++) {
-			var menuItem = this.menuList[i];
-			//add each menu item to screen
-			this.loadMenu[menuItem];
-		}
-	},
-	loadMenu : 		function(incMenuItem) {
-		//incMenuItem is a string
-		if(incMenuItem.indexOf(":")>0){
-			//sub menu detected
-			//Loading up submenu
-			var menu = incMenuItem.substring(0,incMenuItem.indexOf(":"));
-			//When a menu item has a submenu
-			//add a onMouseOver event to bring up submenu
-		
-			addEventListener("mouseover", function (e) {
-				menu.loadMenu(menu);
-				this.subMenuOpen = true;
-			}, false);
-			addEventListener("mouseexit", function (e) {
-				menu.unLoadMenu(menu);
-				this.subMenuOpen = false;
-			}, false);
-		}
-		else {
-			//code to append the menu item to canvas
-		}
-		//for each this.menuList
-		//display(this.menuList[x]);
-	},
-	unloadMenu:		function() {
-		//code to unload menu
-		// remember to delete self when done, as object is no longer needed.removeChild()
-	}
-	
-}
-
-
-
-
-
-
-
-
-	
-	
