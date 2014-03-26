@@ -7,5 +7,5 @@ hct-trx
 
 | Task | Progress |
 |:-------------:| -----:|
-| Game Code | ![33&#37;](http://upload.wikimedia.org/wikipedia/commons/7/7e/Icon_33_percent.png "33&#37;") |
-| Package | ![0&#37;](http://upload.wikimedia.org/wikipedia/commons/4/43/Icon_00_percent.png "0&#37;") |
+| Game Code | ![33%](http://upload.wikimedia.org/wikipedia/commons/7/7e/Icon_33_percent.png "33%") |
+| Package | ![0%](http://upload.wikimedia.org/wikipedia/commons/4/43/Icon_00_percent.png "0%") |
