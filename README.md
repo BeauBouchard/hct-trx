@@ -4,6 +4,8 @@ hct-trx
 2d topdown html5 canvas topdown game. Testing out some different design patterns in javascript in a game design structure. This is to make up for missing out on the last Bacon Game Jam 07 :P.
 
 
+Development Status
+---
 
 | Task | Progress |
 |:-------------:| -----:|
